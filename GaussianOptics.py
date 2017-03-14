@@ -2,7 +2,10 @@ import math
 
 
 class GaussianBeam:
-    """ Gaussian beam. All units are given in SI units.
+    """
+    Gaussian beam.
+
+    All units are given in SI units.
 
     Class attributes:
         :param double wl: Wavelength (in m)
@@ -49,12 +52,29 @@ class GaussianBeam:
         return self._rayleigh_length
 
     def compute_rayleigh_length(self):
+        """
+        Compute the Rayleigh length
+        """
         return math.pi*self._w_0**2/self._wl
 
     def waist_z(self, z):
+        """
+        Compute beam width at position z.
+        :param float z: Position (distance from beam waist)
+        :return: Beam width at position z.
+        """
         return self._w_0*math.sqrt(1+((z-self._z_0)/self._rayleigh_length)**2)
 
-    # Leistung P hinter einer Blende mit Radius r im Abstand z von der Strahltaille
-    # Siehe: https://en.wikipedia.org/wiki/Gaussian_beam#Power_and_intensity
     def power_aperture(self, power_in, r, z):
+        """
+        Compute power behind aperture with radius r at a distance z from the beam waist.
+        Aperture is centered to the beam.
+
+        See https://en.wikipedia.org/wiki/Gaussian_beam#Power_and_intensity
+
+        :param float power_in: Power before aperture
+        :param float r: Radius of aperture
+        :param float z: Position of aperture along beam direction with respect to position of beam waist.
+        :return: Power behind aperture (in W)
+        """
         return power_in*(1-math.exp(-2*r**2/self.waist_z(z)**2))
