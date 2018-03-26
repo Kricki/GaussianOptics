@@ -100,3 +100,54 @@ class GaussianBeam:
 
         """
         return power_in*(1-math.exp(-2*r**2/self.waist_z(z)**2))
+
+    @staticmethod
+    def fiber_coupling_efficiency(mfd, w_x, w_y=None):
+        """Compute coupling efficiency into single-mode fiber for given beam waists
+        Note: reflection from the fiber facets are not taken into account. For uncoated facets, the reflection losses
+        are 8%.
+
+        Parameters
+        ----------
+        mfd : float
+            Mode field diameter of fiber
+        w_x : float
+            Beam waist along x-axis
+        w_y : float
+            Beam waist along y-axis. If None (default) a symmetric beam is assumed.
+
+        Returns
+        -------
+        float
+            Theoretical coupling effiency (0...1)
+        """
+        if w_y is None:
+            w_y = w_x
+
+        eff = 1/(4*(mfd/w_x+w_x/mfd)*(mfd/w_y+w_y/mfd))
+        return eff
+
+    def fiber_coupling_efficiency_lens(self, mfd, f, w_in=None):
+        """Compute coupling efficiency into single-mode fiber using an ideal lens
+        Note: reflection from the fiber facets are not taken into account. For uncoated facets, the reflection losses
+        are 8%.
+
+        Parameters
+        ----------
+        mfd : float
+            Mode field diameter of fiber
+        f : float
+            Focal length of lens infront of fiber
+        w_in : float
+            Beam waist at position of lens
+
+        Returns
+        -------
+        float
+            Theoretical coupling effiency (0...1)
+        """
+        if w_in is None:
+            w_in = self._w_0
+
+        w_lens = 4*self._wl*f/(math.pi*w_in)
+        return self.fiber_coupling_efficiency(mfd, w_lens)
