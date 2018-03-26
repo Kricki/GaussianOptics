@@ -5,15 +5,20 @@ class GaussianBeam:
     """
     Gaussian beam.
 
-    All units are given in SI units.
-
-    Class attributes:
-        :param double wl: Wavelength (in m)
-        :param double w_0: Beam waist at focal position (in m)
-        :param z_0: Position of focal plane, along beam axis (in m). Default = 0.
-
+    https://en.wikipedia.org/wiki/Gaussian_beam
     """
     def __init__(self, wl, w_0, z_0=0):
+        """
+
+        Parameters
+        ----------
+        wl : float
+            Wavelength of light wave
+        w_0 : float
+            Beam waist radius at focal position
+        z_0 : float
+            Position of focal plane, along beam axis. Default = 0.
+        """
         self._wl = wl
         self._w_0 = w_0
         self._z_0 = z_0
@@ -58,23 +63,40 @@ class GaussianBeam:
         return math.pi*self._w_0**2/self._wl
 
     def waist_z(self, z):
-        """
-        Compute beam width at position z.
-        :param float z: Position (distance from beam waist)
-        :return: Beam width at position z.
+        """Compute beam width at position z along beam axis
+
+        Parameters
+        ----------
+        z : float
+            position (distance from beam waist)
+
+        Returns
+        -------
+        float
+            Beam width at position z
+
         """
         return self._w_0*math.sqrt(1+((z-self._z_0)/self._rayleigh_length)**2)
 
     def power_aperture(self, power_in, r, z):
-        """
-        Compute power behind aperture with radius r at a distance z from the beam waist.
-        Aperture is centered to the beam.
+        """Compute power behind aperture with radius r at a distance z from the beam waist.
 
+        Aperture is centered to the beam.
         See https://en.wikipedia.org/wiki/Gaussian_beam#Power_and_intensity
 
-        :param float power_in: Power before aperture
-        :param float r: Radius of aperture
-        :param float z: Position of aperture along beam direction with respect to position of beam waist.
-        :return: Power behind aperture (in W)
+        Parameters
+        ----------
+        power_in : float
+            Power before aperture
+        r : float
+            Radius of aperture
+        z : float
+            Position of aperture along beam direction with respect to position of beam waist.
+
+        Returns
+        -------
+        float
+            Power behind aperture (same dimension as power_in)
+
         """
         return power_in*(1-math.exp(-2*r**2/self.waist_z(z)**2))
